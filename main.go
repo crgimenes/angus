@@ -43,7 +43,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 func ConsoleMsg(c *websocket.Conn, msg string) {
 	out := make([]byte, constants.BufferSize)
 
-	n, err := protocol.Encode(out, []byte(msg), constants.MSG, 1)
+	n, err := protocol.Encode(out, []byte(msg), constants.MSG)
 	if err != nil {
 		log.Println(err)
 		return
@@ -59,7 +59,7 @@ func ConsoleMsg(c *websocket.Conn, msg string) {
 func RunJavascript(c *websocket.Conn, js string) {
 	out := make([]byte, constants.BufferSize)
 
-	n, err := protocol.Encode(out, []byte(js), constants.RUNJS, 1)
+	n, err := protocol.Encode(out, []byte(js), constants.RUNJS)
 	if err != nil {
 		log.Println(err)
 		return
@@ -74,7 +74,7 @@ func RunJavascript(c *websocket.Conn, js string) {
 
 func ApplyCSS(c *websocket.Conn, css string) {
 	out := make([]byte, constants.BufferSize)
-	n, err := protocol.Encode(out, []byte(css), constants.APPLYCSS, 1)
+	n, err := protocol.Encode(out, []byte(css), constants.APPLYCSS)
 	if err != nil {
 		log.Println(err)
 		return
@@ -92,7 +92,7 @@ func ApplyHTML(c *websocket.Conn, id string, html string) {
 
 	s := fmt.Sprintf("%s\n%s", id, html)
 
-	n, err := protocol.Encode(out, []byte(s), constants.APPLYHTML, 1)
+	n, err := protocol.Encode(out, []byte(s), constants.APPLYHTML)
 	if err != nil {
 		log.Println(err)
 		return
@@ -108,7 +108,7 @@ func ApplyHTML(c *websocket.Conn, id string, html string) {
 func LoadJS(c *websocket.Conn, url string) {
 	out := make([]byte, constants.BufferSize)
 
-	n, err := protocol.Encode(out, []byte(url), constants.LOADJS, 1)
+	n, err := protocol.Encode(out, []byte(url), constants.LOADJS)
 	if err != nil {
 		log.Println(err)
 		return
@@ -124,7 +124,7 @@ func LoadJS(c *websocket.Conn, url string) {
 func LoadCSS(c *websocket.Conn, url string) {
 	out := make([]byte, constants.BufferSize)
 
-	n, err := protocol.Encode(out, []byte(url), constants.LOADCSS, 1)
+	n, err := protocol.Encode(out, []byte(url), constants.LOADCSS)
 	if err != nil {
 		log.Println(err)
 		return
@@ -140,7 +140,7 @@ func LoadCSS(c *websocket.Conn, url string) {
 func LoadHTML(c *websocket.Conn, url string) {
 	out := make([]byte, constants.BufferSize)
 
-	n, err := protocol.Encode(out, []byte(url), constants.LOADHTML, 1)
+	n, err := protocol.Encode(out, []byte(url), constants.LOADHTML)
 	if err != nil {
 		log.Println(err)
 		return
@@ -158,7 +158,7 @@ func RegisterEvent(c *websocket.Conn, eventType, label, id string) {
 
 	s := fmt.Sprintf("%s\n%s\n%s", eventType, label, id)
 
-	n, err := protocol.Encode(out, []byte(s), constants.REGISTEREVENT, 1)
+	n, err := protocol.Encode(out, []byte(s), constants.REGISTEREVENT)
 	if err != nil {
 		log.Println(err)
 		return
@@ -225,8 +225,8 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	LoadJS(c, "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
 
 	// load article
-	LoadHTML(c, "https://crg.eti.br/post/arte-generativa-em-javascript-segunda-parte/")
-	LoadJS(c, "https://crg.eti.br/post/arte-generativa-em-javascript-segunda-parte/desenho.js")
+	// LoadHTML(c, "https://crg.eti.br/post/arte-generativa-em-javascript-segunda-parte/")
+	// LoadJS(c, "https://crg.eti.br/post/arte-generativa-em-javascript-segunda-parte/desenho.js")
 
 	//////////////////////////////////////
 
@@ -246,7 +246,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		buf := make([]byte, constants.BufferSize)
-		cmd, n, _, err := protocol.Decode(buf, data)
+		cmd, n, err := protocol.Decode(buf, data)
 		if err != nil {
 			log.Println(err)
 			return

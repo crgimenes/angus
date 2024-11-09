@@ -9,82 +9,31 @@ const REGISTEREVENT = 0x8; // register event listener on element
 const EVENT = 0x9; // event from client
 
 let ws;
-let counter = 0;
 
-function fnv1aHash(data) {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < data.length; i++) {
-    hash ^= data[i];
-    hash = (hash >>> 0) * 0x01000193;
-  }
-  return hash >>> 0;
-}
-
-function encodeProtocol(command, counter, payload) {
+function encodeProtocol(command, payload) {
   const payloadLength = payload.length;
-  const buffer = new ArrayBuffer(1 + 2 + 4 + payloadLength + 4);
+  const buffer = new ArrayBuffer(5 + payloadLength);
   const view = new DataView(buffer);
-  let offset = 0;
 
-  // A: command (opcode, 1 byte)
-  view.setUint8(offset, command);
-  offset += 1;
-
-  // B: counter (2 bytes, big endian)
-  view.setUint16(offset, counter, false);
-  offset += 2;
-
-  // C: payload length (4 bytes, big endian)
-  view.setUint32(offset, payloadLength, false);
-  offset += 4;
-
-  // D: payload
-  const payloadView = new Uint8Array(buffer, offset, payloadLength);
+  view.setUint8(0, command);
+  view.setUint32(1, payloadLength, false);
+  const payloadView = new Uint8Array(buffer, 5, payloadLength);
   payloadView.set(payload);
-  offset += payloadLength;
-
-  // F: checksum (FNV-1a, 32 bits, big endian)
-  const checksum = fnv1aHash(new Uint8Array(buffer, 0, offset));
-  view.setUint32(offset, checksum, false);
-  offset += 4;
 
   return buffer;
 }
 
 function decodeProtocol(buffer) {
-  if (buffer.length < 11) {
-    throw new Error("Buffer muito curto " + buffer.length + ' "' + new TextDecoder().decode(buffer) + '"');
+  if (buffer.length < 5) {
+    throw new Error("Buffer too short " + buffer.length);
   }
 
-  let offset = 0;
-
-  // A: command (opcode, 1 byte)
-  const command = buffer[offset];
-  offset += 1;
-
-  // B: counter (2 bytes, big endian)
-  const counter = new DataView(buffer.slice(offset, offset + 2).buffer).getUint16(0, false);
-  offset += 2;
-
-  // C: payload length (4 bytes, big endian)
-  const payloadLength = new DataView(buffer.slice(offset, offset + 4).buffer).getUint32(0, false);
-  offset += 4;
-
-  if (offset + payloadLength + 4 > buffer.length) {
-    throw new Error("Comprimento de payload inválido");
-  }
-
-  // D: payload
-  const payload = buffer.slice(offset, offset + payloadLength);
-  offset += payloadLength;
-
-  // F: checksum (FNV-1a, 32 bits, big endian)
-  const checksum = new DataView(buffer.slice(offset, offset + 4).buffer).getUint32(0, false);
-  // validate checksum
+  const command = buffer[0];
+  const payloadLength = new DataView(buffer.slice(1, 5).buffer).getUint32(0, false);
+  const payload = buffer.slice(5, 5 + payloadLength);
 
   return {
     command,
-    counter,
     payloadLength,
     payload,
   };
@@ -97,7 +46,7 @@ function connectWS() {
   ws.binaryType = 'arraybuffer';
 
   ws.onopen = () => {
-    console.log('Conectado');
+    console.log('Connected to server');
   };
 
   ws.onmessage = ({ data }) => {
@@ -107,14 +56,13 @@ function connectWS() {
 
     let array = new Uint8Array(data);
     while (array.length > 0) {
-      const { command, counter, payloadLength, payload } = decodeProtocol(array);
+      const { command, payloadLength, payload } = decodeProtocol(array);
       switch (command) {
         case MSG:
-          console.log(counter, new TextDecoder().decode(payload));
+          console.log(new TextDecoder().decode(payload));
           break;
         case RUNJS: {
           const code = new TextDecoder().decode(payload);
-          console.log(counter, code);
           try {
             const result = eval(code);
             console.log('Resultado:', result);
@@ -177,12 +125,11 @@ function connectWS() {
                 label,
                 id,
                 type: event.type,
-                timestamp: event.timeStamp,
                 // add more properties if needed
               };
               const payloadString = JSON.stringify(eventData);
               const payloadBytes = new TextEncoder().encode(payloadString);
-              const messageBuffer = encodeProtocol(EVENT, 0, payloadBytes);
+              const messageBuffer = encodeProtocol(EVENT, payloadBytes);
               ws.send(messageBuffer);
             });
           } else {
@@ -192,13 +139,13 @@ function connectWS() {
           break;
         }
         default:
-          console.log('Unknown command:',command, counter, payloadLength, payload);
+          console.log('Unknown command:',command, payloadLength, payload);
           break;
       }
-      if (array.length <= payloadLength + 11) {
+      if (array.length <= payloadLength + 5) {
         break;
       }
-      array = array.slice(payloadLength + 11);
+      array = array.slice(payloadLength + 5);
     }
   };
 
