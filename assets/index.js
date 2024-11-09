@@ -166,3 +166,8 @@ window.onload = () => {
   connectWS();
 };
 
+// set bootstrap dark mode or light mode based browser preference
+document.documentElement.setAttribute('data-bs-theme', (
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? 
+    'dark' : 
+    'light'));
