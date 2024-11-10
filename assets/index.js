@@ -29,7 +29,10 @@ function decodeProtocol(buffer) {
   }
 
   const command = buffer[0];
-  const payloadLength = new DataView(buffer.slice(1, 5).buffer).getUint32(0, false);
+  const payloadLength = new DataView(buffer.slice(1, 5).buffer).getUint32(
+    0,
+    false,
+  );
   const payload = buffer.slice(5, 5 + payloadLength);
 
   return {
@@ -41,12 +44,12 @@ function decodeProtocol(buffer) {
 
 function connectWS() {
   const { host, pathname: path, protocol: proto } = window.location;
-  const url = `${proto === 'https:' ? 'wss' : 'ws'}://${host}${path === '/' ? '' : path}/ws`;
+  const url = `${proto === "https:" ? "wss" : "ws"}://${host}${path === "/" ? "" : path}/ws`;
   ws = new WebSocket(url);
-  ws.binaryType = 'arraybuffer';
+  ws.binaryType = "arraybuffer";
 
   ws.onopen = () => {
-    console.log('Connected to server');
+    console.log("Connected to server");
   };
 
   ws.onmessage = ({ data }) => {
@@ -65,22 +68,24 @@ function connectWS() {
           const code = new TextDecoder().decode(payload);
           try {
             const result = eval(code);
-            console.log('Resultado:', result);
+            console.log("Resultado:", result);
           } catch (e) {
-            console.error('Erro:', e);
+            console.error("Erro:", e);
           }
           break;
         }
         case APPLYCSS: {
           const css = new TextDecoder().decode(payload);
-          const style = document.createElement('style');
+          const style = document.createElement("style");
           style.textContent = css;
           document.head.appendChild(style);
           break;
         }
         case APPLYHTML: {
-          const [id, ...htmlParts] = new TextDecoder().decode(payload).split('\n');
-          const html = htmlParts.join('\n');
+          const [id, ...htmlParts] = new TextDecoder()
+            .decode(payload)
+            .split("\n");
+          const html = htmlParts.join("\n");
           const element = document.getElementById(id);
           if (element) {
             element.innerHTML = html;
@@ -89,16 +94,16 @@ function connectWS() {
         }
         case LOADJS: {
           const urljs = new TextDecoder().decode(payload);
-          const script = document.createElement('script');
+          const script = document.createElement("script");
           script.src = urljs;
           document.head.appendChild(script);
           break;
         }
         case LOADCSS: {
           const urlcss = new TextDecoder().decode(payload);
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.type = 'text/css';
+          const link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.type = "text/css";
           link.href = urlcss;
           document.head.appendChild(link);
           break;
@@ -106,9 +111,9 @@ function connectWS() {
         case LOADHTML: {
           const urlhtml = new TextDecoder().decode(payload);
           fetch(urlhtml)
-            .then(response => response.text())
-            .then(html => {
-              const element = document.createElement('div');
+            .then((response) => response.text())
+            .then((html) => {
+              const element = document.createElement("div");
               element.innerHTML = html;
               document.body.appendChild(element);
             });
@@ -116,7 +121,7 @@ function connectWS() {
         }
         case REGISTEREVENT: {
           const payloadText = new TextDecoder().decode(payload);
-          const [eventType, label, id] = payloadText.split('\n');
+          const [eventType, label, id] = payloadText.split("\n");
 
           const element = document.getElementById(id);
           if (element) {
@@ -139,7 +144,7 @@ function connectWS() {
           break;
         }
         default:
-          console.log('Unknown command:',command, payloadLength, payload);
+          console.log("Unknown command:", command, payloadLength, payload);
           break;
       }
       if (array.length <= payloadLength + 5) {
@@ -150,24 +155,24 @@ function connectWS() {
   };
 
   ws.onerror = () => {
-    console.log('error occurred, closing connection');
+    console.log("error occurred, closing connection");
     ws.close();
   };
 
   ws.onclose = () => {
-    console.log('reconnecting...');
+    console.log("reconnecting...");
     setTimeout(connectWS, 1000);
   };
 }
 
 // Connect to WebSocket server
 window.onload = () => {
-  console.log('connecting...');
+  console.log("connecting...");
   connectWS();
 };
 
 // set bootstrap dark mode or light mode based browser preference
-document.documentElement.setAttribute('data-bs-theme', (
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 
-    'dark' : 
-    'light'));
+document.documentElement.setAttribute(
+  "data-bs-theme",
+  window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+);
