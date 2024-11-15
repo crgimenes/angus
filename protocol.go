@@ -12,12 +12,10 @@ package angus
 import (
 	"encoding/binary"
 	"errors"
-
-	"angus/constants"
 )
 
 const (
-	MaxPackageSize = constants.BufferSize + 5
+	MaxPackageSize = BufferSize + 5
 )
 
 var (
@@ -51,7 +49,7 @@ func Decode(dest, src []byte) (cmd byte, n int, err error) {
 		return 0, 0, ErrInvalidSize
 	}
 	lenData := int(binary.BigEndian.Uint32(src[1:]))
-	if lenData > constants.BufferSize {
+	if lenData > BufferSize {
 		return 0, 0, ErrInvalidSize
 	}
 	if len(src) < lenData+5 {
