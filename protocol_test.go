@@ -15,7 +15,7 @@ func TestEncodeDecode(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	data := make([]byte, BufferSize)
+	data := make([]byte, BUFFERSIZE)
 	cmd, n, err := Decode(data, out[:nout])
 	if err != nil {
 		t.Fatal(err)
@@ -38,7 +38,7 @@ func TestEncodeDecode(t *testing.T) {
 	}
 
 	// test invalid size
-	_, err = Encode(out, make([]byte, BufferSize+1), 0x01)
+	_, err = Encode(out, make([]byte, BUFFERSIZE+1), 0x01)
 	if err != ErrInvalidSize {
 		t.Errorf("err = %v, want %v", err, ErrInvalidSize)
 	}
@@ -50,13 +50,13 @@ func TestEncodeDecode(t *testing.T) {
 	}
 
 	// test invalid size
-	_, err = Encode(out, make([]byte, BufferSize), 0x01)
+	_, err = Encode(out, make([]byte, BUFFERSIZE), 0x01)
 	if err != nil {
 		t.Errorf("err = %v, want nil", err)
 	}
 
 	// test invalid size
-	_, err = Encode(out, make([]byte, BufferSize-1), 0x01)
+	_, err = Encode(out, make([]byte, BUFFERSIZE-1), 0x01)
 	if err != nil {
 		t.Errorf("err = %v, want nil", err)
 	}
@@ -122,7 +122,7 @@ func randonPayload(n int) string {
 }
 
 func TestEncodeDecodeLoop(t *testing.T) {
-	data := make([]byte, BufferSize)
+	data := make([]byte, BUFFERSIZE)
 	for i := 0; i < 255; i++ {
 		in := []byte(randonPayload(rand.Intn(10 + i)))
 		out := make([]byte, MaxPackageSize)

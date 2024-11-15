@@ -1,8 +1,8 @@
 package angus
 
 const (
-	BufferSize = 262144 // 256K
-	//BufferSize = 1048576 * 5 // 5M
+	BUFFERSIZE = 262144 // 256K
+	//BUFFERSIZE = 1048576 * 5 // 5M
 
 	MSG           = 0x1 // send message to console log
 	RUNJS         = 0x2 // run javascript

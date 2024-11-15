@@ -5,7 +5,8 @@ import (
 	"net/http"
 )
 
-//go:embed *.html *.js
-var assets embed.FS
-
-var FS = http.FS(assets)
+var (
+	//go:embed *.html *.js
+	assets embed.FS
+	FS     = http.FS(assets)
+)

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	MaxPackageSize = BufferSize + 5
+	MaxPackageSize = BUFFERSIZE + 5
 )
 
 var (
@@ -49,7 +49,7 @@ func Decode(dest, src []byte) (cmd byte, n int, err error) {
 		return 0, 0, ErrInvalidSize
 	}
 	lenData := int(binary.BigEndian.Uint32(src[1:]))
-	if lenData > BufferSize {
+	if lenData > BUFFERSIZE {
 		return 0, 0, ErrInvalidSize
 	}
 	if len(src) < lenData+5 {
