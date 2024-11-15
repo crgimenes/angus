@@ -1,7 +1,6 @@
 package angus
 
 import (
-	"crypto/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -103,20 +102,6 @@ func (c *SessionControl) RemoveExpired() {
 			delete(c.SessionDataMap, k)
 		}
 	}
-}
-
-func RandomID() string {
-	const (
-		length  = 16
-		charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	)
-	lenCharset := byte(len(charset))
-	b := make([]byte, length)
-	_, _ = rand.Read(b)
-	for i := 0; i < length; i++ {
-		b[i] = charset[b[i]%lenCharset]
-	}
-	return string(b)
 }
 
 func (c *SessionControl) List() map[string]SessionData {

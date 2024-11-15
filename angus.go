@@ -3,6 +3,7 @@ package angus
 import (
 	"angus/assets"
 	"context"
+	"crypto/rand"
 	"fmt"
 	"log"
 	"net/http"
@@ -215,7 +216,19 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-////////////////////////////////////////
+func RandomID() string {
+	const (
+		length  = 16
+		charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	)
+	lenCharset := byte(len(charset))
+	b := make([]byte, length)
+	_, _ = rand.Read(b)
+	for i := 0; i < length; i++ {
+		b[i] = charset[b[i]%lenCharset]
+	}
+	return string(b)
+}
 
 func ListenAndServe(addr string) error {
 	mux := http.NewServeMux()
