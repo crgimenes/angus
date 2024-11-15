@@ -1,4 +1,4 @@
-package session
+package angus
 
 import (
 	"crypto/rand"

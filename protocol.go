@@ -7,7 +7,7 @@
 // C: payload length (32 bits, big endian)
 // D: payload (array of bytes)
 
-package protocol
+package angus
 
 import (
 	"encoding/binary"
