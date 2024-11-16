@@ -40,6 +40,8 @@ func main() {
 		w.Write(index)
 	})
 
+	log.Println("listen on :8001")
+
 	err := angus.ListenAndServe(":8001")
 	if err != nil {
 		log.Println(err)
