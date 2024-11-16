@@ -3,7 +3,6 @@ package angus
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/coder/websocket"
 )
@@ -32,115 +31,80 @@ func GetClient(name string) *Client {
 	return nil
 }
 
-func (c *Client) ConsoleMsg(msg string) {
+func (c *Client) ConsoleMsg(msg string) error {
 	out := make([]byte, BUFFERSIZE)
 
 	n, err := Encode(out, []byte(msg), MSG)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
 
-func (c *Client) RunJavascript(js string) {
+func (c *Client) RunJavascript(js string) error {
 	out := make([]byte, BUFFERSIZE)
 
 	n, err := Encode(out, []byte(js), RUNJS)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
 
-func (c *Client) ApplyCSS(css string) {
+func (c *Client) ApplyCSS(css string) error {
 	out := make([]byte, BUFFERSIZE)
 	n, err := Encode(out, []byte(css), APPLYCSS)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
 
-func (c *Client) ApplyHTML(id string, html string) {
+func (c *Client) ApplyHTML(id string, html string) error {
 	out := make([]byte, BUFFERSIZE)
 
 	s := fmt.Sprintf("%s\n%s", id, html)
 
 	n, err := Encode(out, []byte(s), APPLYHTML)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
 
-func (c *Client) LoadJS(url string) {
+func (c *Client) LoadJS(url string) error {
 	out := make([]byte, BUFFERSIZE)
 
 	n, err := Encode(out, []byte(url), LOADJS)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
 
-func (c *Client) LoadCSS(url string) {
+func (c *Client) LoadCSS(url string) error {
 	out := make([]byte, BUFFERSIZE)
 
 	n, err := Encode(out, []byte(url), LOADCSS)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
 
-func (c *Client) LoadHTML(url string) {
+func (c *Client) LoadHTML(url string) error {
 	out := make([]byte, BUFFERSIZE)
 
 	n, err := Encode(out, []byte(url), LOADHTML)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	err = c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
