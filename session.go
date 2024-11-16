@@ -16,6 +16,10 @@ type SessionData struct {
 	CurrentScreen int
 }
 
+func GetSessionControl() *SessionControl {
+	return sc
+}
+
 func NewSession(cookieName string) *SessionControl {
 	return &SessionControl{
 		cookieName:     cookieName,

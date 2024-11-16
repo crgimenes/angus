@@ -44,7 +44,7 @@ function decodeProtocol(buffer) {
 
 function connectWS() {
   const { host, pathname: path, protocol: proto } = window.location;
-  const url = `${proto === "https:" ? "wss" : "ws"}://${host}${path === "/" ? "" : path}/ws`;
+  const url = `${proto === "https:" ? "wss" : "ws"}://${host}/angus/ws`;
   ws = new WebSocket(url);
   ws.binaryType = "arraybuffer";
 
@@ -176,3 +176,4 @@ document.documentElement.setAttribute(
   "data-bs-theme",
   window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
 );
+
