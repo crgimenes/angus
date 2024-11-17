@@ -25,8 +25,6 @@ func main() {
 			sid, sd = sc.Create()
 		}
 
-		log.Println("path: ", r.URL.Path)
-
 		// renew session
 		sc.Save(w, r, sid, sd)
 
@@ -41,7 +39,6 @@ func main() {
 	})
 
 	log.Println("listen on :8001")
-
 	err := angus.ListenAndServe(":8001")
 	if err != nil {
 		log.Println(err)
