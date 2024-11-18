@@ -4,6 +4,7 @@ type Msg interface{}
 type Html interface{}
 
 type Model interface {
+	Init() Model
 	Update(msg Msg) Model
 	View() Html
 }

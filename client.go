@@ -23,12 +23,9 @@ func NewClient(c *websocket.Conn) *Client {
 	}
 }
 
-func GetClient(name string) *Client {
-	client, ok := clients[name]
-	if ok {
-		return client
-	}
-	return nil
+func GetClient(sessionId string) (*Client, bool) {
+	cli, ok := clients[sessionId]
+	return cli, ok
 }
 
 func (c *Client) ConsoleMsg(msg string) error {
@@ -105,6 +102,21 @@ func (c *Client) LoadHTML(url string) error {
 	if err != nil {
 		return err
 	}
+
+	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
+}
+
+func (c *Client) RegisterEvent(eventType, id, label string, f func()) error {
+	out := make([]byte, BUFFERSIZE)
+
+	s := fmt.Sprintf("%s\n%s\n%s", eventType, label, id)
+
+	n, err := Encode(out, []byte(s), REGISTEREVENT)
+	if err != nil {
+		return err
+	}
+
+	c.events[id] = f
 
 	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }

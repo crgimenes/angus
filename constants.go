@@ -12,4 +12,5 @@ const (
 	LOADCSS       = 0x6 // load css file from url
 	LOADHTML      = 0x7 // load html file from url
 	REGISTEREVENT = 0x8 // register event
+	EVENT         = 0x9 // event
 )

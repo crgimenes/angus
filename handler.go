@@ -42,6 +42,19 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("wsHandler session id: %v connected\n", sid)
 
+	cli, ok := clients[sid]
+	if !ok {
+		cli = &Client{
+			events: make(map[string]func()),
+		}
+	}
+	cli.conn = c
+	clients[sid] = cli
+
+	cli.RegisterEvent("click", "test-button", "test", func() {
+		log.Println("click button")
+	})
+
 	// buf := make([]byte, constants.BUFFERSIZE)
 	for {
 		_, data, err := c.Read(context.Background())
@@ -65,6 +78,20 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("wsHandler: cmd: %v\n", cmd)
 		log.Printf("wsHandler: n: %v\n", n)
 		log.Printf("wsHandler: data: %v\n", string(buf[:n]))
+
+		switch cmd {
+		case EVENT:
+			log.Printf("EVENT: %v\n", string(buf[:n]))
+			/*
+				f := cli.events[string(buf[:n])]
+				if f != nil {
+					f()
+				}
+			*/
+		default:
+			log.Printf("wsHandler: unknown command: %v\n", cmd)
+		}
+
 	}
 
 }
