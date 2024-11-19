@@ -51,9 +51,15 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	cli.conn = c
 	clients[sid] = cli
 
-	cli.RegisterEvent("click", "test-button", "test", func() {
-		log.Println("click button")
-	})
+	/*
+		cli.RegisterEvent("click", "test-button", "test", func() {
+			log.Println("click button")
+		})
+	*/
+
+	if cli.model != nil {
+		cli.model.Init(cli)
+	}
 
 	// buf := make([]byte, constants.BUFFERSIZE)
 	for {
@@ -75,19 +81,22 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Printf("wsHandler: cmd: %v\n", cmd)
-		log.Printf("wsHandler: n: %v\n", n)
-		log.Printf("wsHandler: data: %v\n", string(buf[:n]))
+		//		log.Printf("wsHandler: cmd: %v\n", cmd)
+		//		log.Printf("wsHandler: n: %v\n", n)
+		//		log.Printf("wsHandler: data: %v\n", string(buf[:n]))
 
 		switch cmd {
 		case EVENT:
-			log.Printf("EVENT: %v\n", string(buf[:n]))
-			/*
-				f := cli.events[string(buf[:n])]
-				if f != nil {
-					f()
-				}
-			*/
+			//log.Printf("EVENT: %v\n", string(buf[:n]))
+			if cli.model != nil {
+				cli.model.HandleEvent(buf[:n])
+			}
+
+			f := cli.events["test-button"]
+			if f != nil {
+				f()
+			}
+
 		default:
 			log.Printf("wsHandler: unknown command: %v\n", cmd)
 		}

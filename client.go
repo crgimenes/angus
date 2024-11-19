@@ -7,20 +7,38 @@ import (
 	"github.com/coder/websocket"
 )
 
-var (
-	clients = make(map[string]*Client)
-)
-
 type Client struct {
 	events map[string]func()
 	conn   *websocket.Conn
+	model  Model
 }
+
+var (
+	clients = make(map[string]*Client)
+)
 
 func NewClient(c *websocket.Conn) *Client {
 	return &Client{
 		events: make(map[string]func()),
 		conn:   c,
 	}
+}
+
+type Model interface {
+	HandleEvent([]byte)
+	Init(cli *Client)
+}
+
+func RegisterClient(sid string, c *websocket.Conn, model Model) {
+	cli, ok := clients[sid]
+	if !ok {
+		cli = &Client{
+			events: make(map[string]func()),
+		}
+	}
+	cli.conn = c
+	cli.model = model
+	clients[sid] = cli
 }
 
 func GetClient(sessionId string) (*Client, bool) {
@@ -116,7 +134,9 @@ func (c *Client) RegisterEvent(eventType, id, label string, f func()) error {
 		return err
 	}
 
-	c.events[id] = f
+	events := c.events
+	events[id] = f
+	c.events = events
 
 	return c.conn.Write(context.Background(), websocket.MessageBinary, out[:n])
 }
