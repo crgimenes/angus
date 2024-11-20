@@ -30,19 +30,10 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
 
 	mux := angus.ServeMux()
-	sc := angus.GetSessionControl()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		sid, sd, ok := sc.Get(r)
-		if !ok {
-			sid, sd = sc.Create()
-		}
+		angus.Prepare(w, r, &Model{})
 
-		// renew session
-		sc.Save(w, r, sid, sd)
-		angus.RegisterClient(sid, nil, &Model{})
-
-		// load assets index.html
 		index, err := assets.ReadFile("assets/index.html")
 		if err != nil {
 			log.Println(err)
