@@ -26,7 +26,7 @@ func NewClient(c *websocket.Conn) *Client {
 
 type Model interface {
 	HandleEvent([]byte)
-	Init(cli *Client)
+	Init()
 }
 
 func RegisterClient(sid string, c *websocket.Conn, model Model) {

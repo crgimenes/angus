@@ -12,8 +12,7 @@ const (
 )
 
 var (
-	mux *http.ServeMux  = http.NewServeMux()
-	sc  *SessionControl = NewSession(cookieName)
+	mux *http.ServeMux = http.NewServeMux()
 	mx  sync.Mutex
 )
 
@@ -33,18 +32,6 @@ func RandomID() string {
 
 func ServeMux() *http.ServeMux {
 	return mux
-}
-
-func Prepare(w http.ResponseWriter, r *http.Request, model Model) {
-	sid, sd, ok := sc.Get(r)
-	if !ok {
-		sid, sd = sc.Create()
-	}
-
-	// renew session
-	sc.Save(w, r, sid, sd)
-
-	RegisterClient(sid, nil, model)
 }
 
 func ListenAndServe(addr string) error {

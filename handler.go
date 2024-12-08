@@ -10,29 +10,12 @@ import (
 )
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {
-	sid, sd, ok := sc.Get(r)
-	if !ok {
-		sid, sd = sc.Create()
-	}
-
-	// renew session
-	sc.Save(w, r, sid, sd)
-
-	// serve files // StripPrefix /angus
-	http.StripPrefix("/angus/", http.FileServer(assets.FS)).ServeHTTP(w, r)
-
+	http.StripPrefix(
+		"/angus/",
+		http.FileServer(assets.FS)).ServeHTTP(w, r)
 }
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
-	sid, sd, ok := sc.Get(r)
-	if !ok {
-		sid, sd = sc.Create()
-	}
-
-	// renew session
-	sc.Save(w, r, sid, sd)
-
-	////////////////////////////////////////////////
 	c, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -40,22 +23,10 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("wsHandler session id: %v connected\n", sid)
-
-	cli, ok := clients[sid]
-	if !ok {
-		cli = &Client{
-			events: make(map[string]func()),
-		}
+	cli := &Client{
+		events: make(map[string]func()),
+		conn:   c,
 	}
-	cli.conn = c
-	clients[sid] = cli
-
-	/*
-		cli.RegisterEvent("click", "test-button", "test", func() {
-			log.Println("click button")
-		})
-	*/
 
 	if cli.model != nil {
 		cli.model.Init(cli)

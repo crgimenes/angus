@@ -32,8 +32,6 @@ func main() {
 	mux := angus.ServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		angus.Prepare(w, r, &Model{})
-
 		index, err := assets.ReadFile("assets/index.html")
 		if err != nil {
 			log.Println(err)
