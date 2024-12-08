@@ -30,6 +30,17 @@ const (
 	EVENT         = 0x9 // event
 )
 
+type Client struct {
+	events map[string]func()
+	conn   *websocket.Conn
+	model  Model
+}
+
+type Model interface {
+	HandleEvent([]byte)
+	Init()
+}
+
 var (
 	mux            *http.ServeMux = http.NewServeMux()
 	mx             sync.Mutex
@@ -158,22 +169,11 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type Client struct {
-	events map[string]func()
-	conn   *websocket.Conn
-	model  Model
-}
-
 func NewClient(c *websocket.Conn) *Client {
 	return &Client{
 		events: make(map[string]func()),
 		conn:   c,
 	}
-}
-
-type Model interface {
-	HandleEvent([]byte)
-	Init()
 }
 
 func (c *Client) ConsoleMsg(msg string) error {
