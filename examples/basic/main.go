@@ -13,19 +13,6 @@ var (
 	assetsFS = http.FS(assets)
 )
 
-type Model struct {
-}
-
-func (m Model) Init(cli *angus.Client) {
-	cli.RegisterEvent("click", "test-button", "test", func() {
-		log.Println("click button")
-	})
-}
-
-func (m Model) HandleEvent(b []byte) {
-	log.Println("handle event", string(b))
-}
-
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
 

@@ -33,18 +33,12 @@ const (
 type Client struct {
 	events map[string]func()
 	conn   *websocket.Conn
-	model  Model
-}
-
-type Model interface {
-	HandleEvent([]byte)
-	Init()
 }
 
 var (
 	mux            *http.ServeMux = http.NewServeMux()
 	mx             sync.Mutex
-	ErrInvalidSize = errors.New("invalid size")
+	ErrInvalidSize = errors.New("invalid buffer size")
 )
 
 // Encode encodes the source data into the destination buffer
@@ -114,18 +108,14 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		log.Println(err)
-
 		return
 	}
 
-	cli := &Client{
-		events: make(map[string]func()),
-		conn:   c,
-	}
+	cli := NewClient(c)
 
-	if cli.model != nil {
-		cli.model.Init()
-	}
+	cli.RegisterEvent("click", "test-button", "Test Button", func() {
+		cli.ConsoleMsg("Test Button clicked")
+	})
 
 	// buf := make([]byte, constants.BUFFERSIZE)
 	for {
@@ -153,11 +143,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 		switch cmd {
 		case EVENT:
-			//log.Printf("EVENT: %v\n", string(buf[:n]))
-			if cli.model != nil {
-				cli.model.HandleEvent(buf[:n])
-			}
-
+			log.Printf("EVENT: %v\n", string(buf[:n]))
 			f := cli.events["test-button"]
 			if f != nil {
 				f()
